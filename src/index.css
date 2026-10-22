@@ -1,0 +1,33 @@
+@import '@fontsource/heebo/400.css';
+@import '@fontsource/heebo/500.css';
+@import '@fontsource/heebo/700.css';
+@import 'tailwindcss';
+
+/* RTL rules: logical properties only (inline-start / inline-end, text-align: start). Never left / right. */
+
+@theme {
+  --font-sans: 'Heebo', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    margin: 0;
+    text-align: start;
+  }
+
+  /* Mixed Hebrew / English text aligns by its own first strong character. */
+  input,
+  textarea,
+  [data-user-content] {
+    unicode-bidi: plaintext;
+  }
+
+  /* Direction-implying icons flip under RTL. */
+  [dir='rtl'] .icon-directional {
+    transform: scaleX(-1);
+  }
+}

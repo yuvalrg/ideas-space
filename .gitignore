@@ -1,0 +1,16 @@
+node_modules
+dist
+exports
+*.tsbuildinfo
+*.log
+
+# Secrets: never commit env files (only the empty example)
+.env*
+!.env.example
+
+# Supabase CLI local state
+supabase/.temp
+supabase/.branches
+
+.DS_Store
+Thumbs.db

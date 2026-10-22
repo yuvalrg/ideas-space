@@ -1,0 +1,2 @@
+# Keep LF everywhere (Prettier expects LF; avoids CRLF churn on Windows checkouts)
+* text=auto eol=lf
