@@ -13,7 +13,10 @@
     "lint": "eslint .",
     "typecheck": "tsc -b",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:db": "node scripts/test-db.mjs",
+    "test:db:remote": "node scripts/test-db.mjs --remote",
+    "db:push": "supabase db push --linked --include-seed"
   },
   "dependencies": {
     "@fontsource/heebo": "^5.3.0",
@@ -22,6 +25,8 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.11",
+    "@electric-sql/pglite-pgtap": "^0.0.12",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.5",
@@ -33,6 +38,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
+    "pg": "^8.23.1",
     "prettier": "^3.9.10",
     "supabase": "^2.121.0",
     "tailwindcss": "^4.3.3",

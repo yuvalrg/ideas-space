@@ -15,6 +15,17 @@ React + TypeScript + Vite, Tailwind (RTL), Supabase (Postgres + RLS, Auth magic 
 2. Copy `supabase/seed.template.sql` to `supabase/seed.sql` and fill the INSERT placeholders (workspace name, partner emails).
 3. Open Claude Code in this folder and follow `PLAN.md` from step 0.
 
+## Database
+- Schema, RLS, functions and the `idea-files` bucket: `supabase/migrations/*.sql` (applied in file order).
+- Seed (workspace name, categories, allowed emails): `supabase/seed.sql`. Safe to re-run.
+- Link the CLI once: `npx supabase login`, then `npx supabase link --project-ref <ref>`.
+- Apply to the linked dev project: `npm run db:push` (migrations + seed). Needs Postgres ports 5432/6543
+  open (not on a blocking corporate network) and asks for the database password.
+- Tests: `npm run test:db` runs `supabase/tests/*.sql` (pgTAP) offline on PGlite, no Docker or network.
+  `npm run test:db:remote` runs the same tests against the database in the `SUPABASE_DB_URL` environment
+  variable (Dashboard -> Connect -> Session pooler string with the password). Set it only in the terminal
+  session; never commit it. Every test file rolls back.
+
 ## Operations
 - Backup owner: INSERT name. Deputy (acts if not done by the 10th of the month): INSERT name.
 - Monthly: run `npm run export`, save the JSON to the shared drive.

@@ -4,7 +4,8 @@
 
 -- 1. Workspace name (one row). INSERT: replace the placeholder.
 insert into app_settings (key, value) values
-  ('workspace_name', 'INSERT: שם המרחב כאן');   -- e.g. 'מרחב הרעיונות שלנו'
+  ('workspace_name', 'INSERT: שם המרחב כאן')   -- e.g. 'מרחב הרעיונות שלנו'
+on conflict (key) do nothing;
 
 -- 2. The 7 starter categories (decided 21.10.2026). Colors are suggestions; adjust freely.
 insert into categories (name, color, sort_order, is_active) values
@@ -14,11 +15,13 @@ insert into categories (name, color, sort_order, is_active) values
   ('מוצר או אפליקציה',     '#059669', 4, true),
   ('שיתוף פעולה',          '#d97706', 5, true),
   ('קהילה',                '#db2777', 6, true),
-  ('אחר',                  '#6b7280', 7, true);
+  ('אחר',                  '#6b7280', 7, true)
+on conflict (name) do nothing;
 
 -- 3. Allowed partner emails (2-4 rows). INSERT: one row per partner, lowercase emails.
 -- The first person to sign in becomes 'joined' automatically via the auth trigger.
 insert into allowed_emails (email, status) values
   ('INSERT: partner1@example.com', 'invited'),
-  ('INSERT: partner2@example.com', 'invited');
+  ('INSERT: partner2@example.com', 'invited')
+on conflict (email) do nothing;
   -- add partner3 / partner4 rows if needed

@@ -39,6 +39,19 @@ Add new out-of-scope ideas here instead of building them.
 - Step 0: `src/lib/supabase.ts` creates the client lazily (`getSupabase()`), so the shell renders without `.env.local`.
 - Step 0: `index.html` title is English; the Hebrew title is set from `he.json` in `src/main.tsx` (hard rule 2).
 - Step 0: `public/manifest.json` deferred to step 2 (PWA is in that step's prompt).
+- Step 1: The build laptop's network blocks Postgres ports (5432/6543), and Docker is not installed. `npm run test:db` therefore runs migrations + seed + `supabase/tests` offline on PGlite with a small Supabase stand-in (`scripts/db-offline/supabase-shim.sql`). `npm run db:push` and `npm run test:db:remote` (plain `pg` client, no Docker) run from an open network.
+- Step 1: With only the anon key, every table and view returns a permission error (401/403 from the REST API), not `[]`. This is by design: anon has no table privileges at all, and RLS is the second layer. The acceptance check "0 rows" passes when no data comes back.
+- Step 1: Added `app_settings (key, value)` for the workspace name (not in spec section 7; seed.sql needs it). Added `profiles.email` (spec section 5 lists email as profile data) to link profiles to `allowed_emails`.
+- Step 1: `activity_log.summary` stores user content (idea title, item snippet, email), not a Hebrew sentence (hard rule 3). The client builds the Hebrew line from `action` via he.json.
+- Step 1: `duplicate_idea(idea_id, title)` takes the new title from the client, so the Hebrew "copy of" prefix stays in he.json.
+- Step 1: `create_idea` also requires the summary (`summary_required`), per spec section 6 (two required fields).
+- Step 1: `save_idea` sections: a key missing from `p_sections` keeps its content; a blank or null value clears that section. Unknown keys raise `invalid_section_key`.
+- Step 1: `invite_partner` on an email whose profile already exists (a removed partner returning) sets it `joined` and reactivates the profile, since the auth trigger runs only on first sign-in.
+- Step 1: `touch_last_seen` does not write `activity_log` (it runs on every home screen load).
+- Step 1: Every foreign key is `ON DELETE RESTRICT` (not only those to profiles), except `activity_log.idea_id` (`SET NULL`, so the log outlives a phase 2 permanent delete).
+- Step 1: Grants are a second layer under RLS: anon has no table privileges, function EXECUTE is revoked from PUBLIC and granted per API function. New tables and functions in later migrations must grant explicitly.
+- Step 1: Resource links must start with http(s); items/resources/decisions stamp `created_by` / `deleted_by` / `answered_by` in triggers, so the client cannot spoof them.
+- Step 1: Workspace name seeded as "מרחב רעיונות משותף" (no name given yet; editable in settings in step 6).
 
 ---
 
@@ -91,6 +104,9 @@ Done when: `npm run dev` shows an RTL Hebrew placeholder page; `npm run lint` an
 `.env.local` is gitignored.
 
 ### Step 1 - Database foundation
+- [ ] Offline done 22.10.2026: migrations + seed apply cleanly and `npm run test:db` passes (173 assertions)
+  on PGlite. Still open (needs an open network): `npm run db:push` to the dev project, then
+  `npm run test:db:remote` and the anon-key `curl` check.
 Read spec sections 3, 7, 8, 11. Prompt: "Write migrations under `supabase/migrations/`: the enums, the 11
 tables from spec section 7, the `_live` views (filtering `deleted_at IS NULL`), the pg_trgm indexes,
 `is_member()` and `check_email_allowed()`, RLS policies on every table and the storage bucket, the
