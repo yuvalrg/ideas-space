@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { NavLink, Outlet } from 'react-router';
 import { t, type MessageKey } from '../lib/i18n';
-import { getSupabase } from '../lib/supabase';
+import { getWorkspaceName } from '../features/settings/api';
 import { useAuth } from '../features/auth/authContext';
 import { CloseIcon, MenuIcon } from './icons';
 
@@ -14,21 +14,24 @@ const NAV_ITEMS: { to: string; label: MessageKey }[] = [
   { to: '/settings', label: 'nav.settings' },
 ];
 
-/** The workspace name from app_settings, falling back to the app name. */
+/** The workspace name from app_settings (updated live when renamed in settings). */
 function useWorkspaceName(): string {
   const [name, setName] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
-    getSupabase()
-      .from('app_settings')
-      .select('value')
-      .eq('key', 'workspace_name')
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!cancelled && data) setName(data.value);
-      });
+    getWorkspaceName().then(
+      (value) => {
+        if (!cancelled && value) setName(value);
+      },
+      () => {
+        // keep the app name
+      },
+    );
+    const onRenamed = (event: Event) => setName((event as CustomEvent<string>).detail);
+    window.addEventListener('workspace-name', onRenamed);
     return () => {
       cancelled = true;
+      window.removeEventListener('workspace-name', onRenamed);
     };
   }, []);
   return name ?? t('app.name');

@@ -147,6 +147,17 @@ select throws_ok($$select public.log_activity('fake', 'idea', null, null)$$, '42
 select throws_ok($$select public.idea_snapshot((select idea_id from fx))$$, '42501', null, 'member cannot call idea_snapshot');
 select throws_ok($$select public.handle_new_user()$$, '42501', null, 'member cannot call handle_new_user');
 
+-- Storage paths: idea files under ideas/, pictures only in the partner's own avatars/ folder.
+select lives_ok(
+  $$insert into storage.objects (bucket_id, name) values ('idea-files', 'avatars/aaaaaaaa-0000-4000-8000-00000000000a/me.jpg')$$,
+  'member uploads into own avatar folder');
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name) values ('idea-files', 'avatars/eeeeeeee-0000-4000-8000-00000000000e/x.jpg')$$,
+  '42501', null, 'member cannot upload into another partner''s avatar folder');
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name) values ('idea-files', 'elsewhere/x.jpg')$$,
+  '42501', null, 'member cannot upload outside ideas/ and avatars/');
+
 reset role;
 
 -- Auth trigger, bucket, and nothing was changed by the stranger ------------------------------------

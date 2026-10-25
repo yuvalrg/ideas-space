@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import { t, type MessageKey } from '../lib/i18n';
 import { errorMessageKey, getSupabase } from '../lib/supabase';
 import { useAuth } from '../features/auth/authContext';
@@ -67,6 +67,8 @@ export function HomeRoute() {
   const { profile } = useAuth();
   const lookups = useLookups();
   const [params, setParams] = useSearchParams();
+  // e.g. "moved to the trash", passed by the idea page when it navigates here
+  const notice = (useLocation().state as { notice?: string } | null)?.notice;
   const query = (params.get('q') ?? '').trim();
   const statusFilter = params.get('status') ?? 'active';
   const categoryFilter = params.get('category') ?? '';
@@ -99,8 +101,11 @@ export function HomeRoute() {
     };
   }, []);
 
-  // Typing updates the URL after a short pause; the URL drives the search.
+  // Typing updates the URL after a short pause; the URL drives the search. Only when the text
+  // changed: replacing the URL also drops navigation state (e.g. the "moved to trash" notice).
+  const urlQuery = params.get('q') ?? '';
   useEffect(() => {
+    if (searchText.trim() === urlQuery.trim()) return;
     const timer = setTimeout(() => {
       setParams(
         (current) => {
@@ -113,7 +118,7 @@ export function HomeRoute() {
       );
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchText, setParams]);
+  }, [searchText, urlQuery, setParams]);
 
   useEffect(() => {
     if (!query) return;
@@ -181,6 +186,14 @@ export function HomeRoute() {
           {t('nav.newIdea')}
         </Link>
       </div>
+      {notice && (
+        <p role="status" className="mt-4 text-sm font-medium text-emerald-700">
+          {notice}{' '}
+          <Link to="/trash" className="underline">
+            {t('nav.trash')}
+          </Link>
+        </p>
+      )}
 
       {data && data.ideas.length === 0 ? (
         <div className="card mt-8 text-center">

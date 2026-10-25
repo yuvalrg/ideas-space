@@ -5,11 +5,13 @@ import { AppShell } from './components/AppShell';
 import { LoginRoute } from './routes/LoginRoute';
 import { WelcomeRoute } from './routes/WelcomeRoute';
 import { HomeRoute } from './routes/HomeRoute';
-import { ComingSoonRoute } from './routes/ComingSoonRoute';
 import { NewIdeaRoute } from './routes/NewIdeaRoute';
 import { IdeaRoute } from './routes/IdeaRoute';
 import { IdeaVersionsRoute } from './routes/IdeaVersionsRoute';
 import { QuestionsRoute } from './routes/QuestionsRoute';
+import { ActivityRoute } from './routes/ActivityRoute';
+import { TrashRoute } from './routes/TrashRoute';
+import { SettingsRoute } from './routes/SettingsRoute';
 
 /** Every route except /login sits behind RequireAuth (spec section 11: no public pages). */
 export function App() {
@@ -26,15 +28,9 @@ export function App() {
               <Route path="ideas/:id" element={<IdeaRoute />} />
               <Route path="ideas/:id/versions" element={<IdeaVersionsRoute />} />
               <Route path="questions" element={<QuestionsRoute />} />
-              <Route
-                path="activity"
-                element={<ComingSoonRoute titleKey="nav.activity" step={6} />}
-              />
-              <Route path="trash" element={<ComingSoonRoute titleKey="nav.trash" step={6} />} />
-              <Route
-                path="settings"
-                element={<ComingSoonRoute titleKey="nav.settings" step={6} />}
-              />
+              <Route path="activity" element={<ActivityRoute />} />
+              <Route path="trash" element={<TrashRoute />} />
+              <Route path="settings" element={<SettingsRoute />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Route>

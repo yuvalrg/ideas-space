@@ -24,6 +24,8 @@ import { clearDraft, readDraft, sameSnapshot, type Draft } from '../features/ide
 import { IdeaEditor } from '../features/ideas/IdeaEditor';
 import { partnerName, useLookups } from '../features/ideas/useLookups';
 import { IdeaItems } from '../features/items/IdeaItems';
+import { trashIdea } from '../features/trash/api';
+import { Dialog } from '../components/Dialog';
 import { IdeaResources } from '../features/resources/IdeaResources';
 import { IdeaDecisions } from '../features/decisions/IdeaDecisions';
 
@@ -53,6 +55,7 @@ function IdeaPage({ id }: { id: string }) {
   const [editing, setEditing] = useState<{ initial: Snapshot; baseVersion: number } | null>(null);
   const [draft, setDraft] = useState<Draft | null>(() => readDraft(id));
   const [busy, setBusy] = useState(false);
+  const [confirmTrash, setConfirmTrash] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -128,6 +131,18 @@ function IdeaPage({ id }: { id: string }) {
     try {
       const newId = await duplicateIdea(id, t('idea.duplicatePrefix', { title: idea.title }));
       navigate(`/ideas/${newId}`);
+    } catch (cause) {
+      setError(errorMessageKey(cause));
+      setBusy(false);
+    }
+  }
+
+  async function moveToTrash() {
+    setConfirmTrash(false);
+    setBusy(true);
+    try {
+      await trashIdea(id);
+      navigate('/', { state: { notice: t('idea.trashed', { title: idea.title }) } });
     } catch (cause) {
       setError(errorMessageKey(cause));
       setBusy(false);
@@ -231,7 +246,40 @@ function IdeaPage({ id }: { id: string }) {
             >
               {t('idea.duplicate')}
             </button>
+            <button
+              type="button"
+              className={`${menuItemClass} text-red-700`}
+              disabled={busy}
+              onClick={() => setConfirmTrash(true)}
+            >
+              {t('idea.trash')}
+            </button>
           </ActionsMenu>
+          <Dialog
+            open={confirmTrash}
+            title={t('idea.trashTitle')}
+            onClose={() => setConfirmTrash(false)}
+            actions={
+              <>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setConfirmTrash(false)}
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="button"
+                  className="btn-primary bg-red-600 hover:bg-red-700"
+                  onClick={() => void moveToTrash()}
+                >
+                  {t('idea.trash')}
+                </button>
+              </>
+            }
+          >
+            <p className="text-slate-700">{t('idea.trashText')}</p>
+          </Dialog>
         </div>
       </header>
 

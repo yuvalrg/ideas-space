@@ -67,7 +67,10 @@ export function formatSize(bytes: number): string {
  * Photos larger than 2500px on the long side are scaled down in the browser before upload (spec
  * section 9). HEIC cannot be decoded by most browsers, so it is uploaded as is.
  */
-export async function downscaleImage(file: File): Promise<Blob> {
+export async function downscaleImage(
+  file: File,
+  maxPixels: number = MAX_IMAGE_PIXELS,
+): Promise<Blob> {
   const type = mimeTypeOf(file);
   if (!['image/jpeg', 'image/png', 'image/webp'].includes(type)) return file;
   let bitmap: ImageBitmap;
@@ -76,7 +79,7 @@ export async function downscaleImage(file: File): Promise<Blob> {
   } catch {
     return file;
   }
-  const scale = MAX_IMAGE_PIXELS / Math.max(bitmap.width, bitmap.height);
+  const scale = maxPixels / Math.max(bitmap.width, bitmap.height);
   if (scale >= 1) {
     bitmap.close();
     return file;

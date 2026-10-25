@@ -77,6 +77,10 @@ Add new out-of-scope ideas here instead of building them.
 - Step 5: Due dates use the native `<input type="date">` (RTL in Chrome, Android and iOS); no date-picker library.
 - Step 5: Deleting a decision hides it only; the idea keeps the next step, owner and status it set.
 - Step 5: The signed-URL expiry was tested with a 2-second URL (fails after expiry, "exp" claim); production URLs last 60 minutes.
+- Step 6: Profile pictures live in the same private bucket under `avatars/{profile_id}/`; each partner may upload only into their own folder (storage policy, tested). `profiles.avatar_url` holds the storage path; screens use 60-minute signed URLs. Pictures are resized to 256px.
+- Step 6: Removing a partner requires typing their display name (or email if they never joined) - spec decision 6. Removing yourself ends your access at once (the no-access screen).
+- Step 6: Inviting does not send an email (Supabase has no invite-only flow that fits magic links here); the address is added to the allowed list and the partner signs in from the login page.
+- Step 6: The activity line is "actor · action · idea", with user content (snippet, email, new workspace name) underneath; idea.* actions show only the idea link. Trashed ideas show their title without a link.
 
 ---
 
@@ -194,6 +198,15 @@ and the decision form calling `record_decision` so next_step/owner/status land o
 Done when: acceptance criteria 7, 8, 9 pass; a signed URL fails after it expires.
 
 ### Step 6 - Trash, activity, settings
+- [x] Done 25.10.2026: trash (name, who, when, status before; restore only) and "move to trash" on the
+  idea page; activity feed (last 50, Hebrew lines from action codes, link to the idea); settings
+  (workspace name, live in the menu; my profile: name and a 256px picture; partners with status, invite,
+  re-invite, remove with typed-name confirmation and the last-partner guard). Migration
+  `20261025120000_avatar_storage.sql` pushed; `test:db` and `test:db:remote` pass (180). Checked in Chrome:
+  criterion 10 (trash and restore: 2 items, 2 resources, 1 decision, status kept), 11 (invite adds the
+  address, logged; signing in from a new address still needs a real mailbox), 12 (removing yuvalr2d2:
+  its next request as that user gets is_member=false, 0 ideas, create_idea refused; re-invite restores).
+  The "new" mark (step 3) still needs a second partner's real edit to see.
 Read spec sections 5, 6, 8. Prompt: "Build trash (restore only in Phase 1), the group activity feed (last
 50), settings (workspace name, partner list with status, invite, remove with typed-name confirm and
 last-partner guard), and the `new` mark via `touch_last_seen`."
