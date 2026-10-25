@@ -39,7 +39,7 @@ Add new out-of-scope ideas here instead of building them.
 - Step 0: `src/lib/supabase.ts` creates the client lazily (`getSupabase()`), so the shell renders without `.env.local`.
 - Step 0: `index.html` title is English; the Hebrew title is set from `he.json` in `src/main.tsx` (hard rule 2).
 - Step 0: `public/manifest.json` deferred to step 2 (PWA is in that step's prompt).
-- Step 1: The build laptop's network blocks Postgres ports (5432/6543), and Docker is not installed. `npm run test:db` therefore runs migrations + seed + `supabase/tests` offline on PGlite with a small Supabase stand-in (`scripts/db-offline/supabase-shim.sql`). `npm run db:push` and `npm run test:db:remote` (plain `pg` client, no Docker) run from an open network.
+- Step 1: The build laptop's network blocks Postgres ports (5432/6543), and Docker is not installed. `npm run test:db` therefore runs migrations + seed + `supabase/tests` offline on PGlite with a small Supabase stand-in (`scripts/db-offline/supabase-shim.sql`). `npm run db:push` and `npm run test:db:remote` run from an open network (office network blocks them; WiFi without the office cable works). `supabase test db --linked` needs Docker, so `test:db:remote` sends each test file through `supabase db query --linked` (CLI login, no DB password) and ends it with a raised exception that carries the pgTAP counts and forces the rollback.
 - Step 1: With only the anon key, every table and view returns a permission error (401/403 from the REST API), not `[]`. This is by design: anon has no table privileges at all, and RLS is the second layer. The acceptance check "0 rows" passes when no data comes back.
 - Step 1: Added `app_settings (key, value)` for the workspace name (not in spec section 7; seed.sql needs it). Added `profiles.email` (spec section 5 lists email as profile data) to link profiles to `allowed_emails`.
 - Step 1: `activity_log.summary` stores user content (idea title, item snippet, email), not a Hebrew sentence (hard rule 3). The client builds the Hebrew line from `action` via he.json.
@@ -104,9 +104,9 @@ Done when: `npm run dev` shows an RTL Hebrew placeholder page; `npm run lint` an
 `.env.local` is gitignored.
 
 ### Step 1 - Database foundation
-- [ ] Offline done 22.10.2026: migrations + seed apply cleanly and `npm run test:db` passes (173 assertions)
-  on PGlite. Still open (needs an open network): `npm run db:push` to the dev project, then
-  `npm run test:db:remote` and the anon-key `curl` check.
+- [x] Done 25.10.2026: migrations + seed pushed to the dev project (`npm run db:push`); `npm run test:db`
+  (offline) and `npm run test:db:remote` (dev project) both pass, 177 assertions; anon-key REST sweep returns
+  401 on all 12 tables and 4 views, `create_idea` refused, `check_email_allowed` true/false as expected.
 Read spec sections 3, 7, 8, 11. Prompt: "Write migrations under `supabase/migrations/`: the enums, the 11
 tables from spec section 7, the `_live` views (filtering `deleted_at IS NULL`), the pg_trgm indexes,
 `is_member()` and `check_email_allowed()`, RLS policies on every table and the storage bucket, the

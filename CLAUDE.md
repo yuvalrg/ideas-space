@@ -86,7 +86,7 @@ supabase start                   # optional local stack
 supabase db push                 # apply migrations to the linked project
 supabase db reset                # local: rebuild from migrations + seed
 npm run test:db                  # runs supabase/tests/*.sql offline on PGlite (no Docker, no network)
-npm run test:db:remote           # same tests against SUPABASE_DB_URL (dev project; needs open Postgres ports)
+npm run test:db:remote           # same tests against the linked dev project (needs open Postgres ports)
 npm run db:push                  # migrations + seed to the linked dev project
 npm run export                   # scripts/export.ts -> exports/<date>/
 npm run import -- <file.json>    # scripts/import.ts into the linked (empty) project

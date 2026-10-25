@@ -22,9 +22,8 @@ React + TypeScript + Vite, Tailwind (RTL), Supabase (Postgres + RLS, Auth magic 
 - Apply to the linked dev project: `npm run db:push` (migrations + seed). Needs Postgres ports 5432/6543
   open (not on a blocking corporate network) and asks for the database password.
 - Tests: `npm run test:db` runs `supabase/tests/*.sql` (pgTAP) offline on PGlite, no Docker or network.
-  `npm run test:db:remote` runs the same tests against the database in the `SUPABASE_DB_URL` environment
-  variable (Dashboard -> Connect -> Session pooler string with the password). Set it only in the terminal
-  session; never commit it. Every test file rolls back.
+  `npm run test:db:remote` runs the same tests against the linked dev project through the Supabase CLI
+  login (no database password needed). Every test file rolls back, so no test data is left behind.
 
 ## Operations
 - Backup owner: INSERT name. Deputy (acts if not done by the 10th of the month): INSERT name.
