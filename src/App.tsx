@@ -9,6 +9,7 @@ import { ComingSoonRoute } from './routes/ComingSoonRoute';
 import { NewIdeaRoute } from './routes/NewIdeaRoute';
 import { IdeaRoute } from './routes/IdeaRoute';
 import { IdeaVersionsRoute } from './routes/IdeaVersionsRoute';
+import { QuestionsRoute } from './routes/QuestionsRoute';
 
 /** Every route except /login sits behind RequireAuth (spec section 11: no public pages). */
 export function App() {
@@ -24,10 +25,7 @@ export function App() {
               <Route path="ideas/new" element={<NewIdeaRoute />} />
               <Route path="ideas/:id" element={<IdeaRoute />} />
               <Route path="ideas/:id/versions" element={<IdeaVersionsRoute />} />
-              <Route
-                path="questions"
-                element={<ComingSoonRoute titleKey="nav.openQuestions" step={4} />}
-              />
+              <Route path="questions" element={<QuestionsRoute />} />
               <Route
                 path="activity"
                 element={<ComingSoonRoute titleKey="nav.activity" step={6} />}

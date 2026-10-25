@@ -68,6 +68,10 @@ Add new out-of-scope ideas here instead of building them.
 - Step 3: One edit mode for the whole idea (title, summary, category, 10 sections) and one save = one version. `saveIdea` always sends all 10 sections (blank clears).
 - Step 3: Local draft every 5 seconds while the form differs from the saved idea, keyed per idea, with the version it started from. A restored draft saves against that version, so a change made meanwhile raises the conflict dialog instead of being overwritten silently. Drafts clear on a successful save or an explicit discard.
 - Step 3: Dialogs use the native `<dialog>` element (focus trap, Escape, RTL for free); no component library yet.
+- Step 4: On the idea page a question stays under "open questions" until answered, then joins the "shared thinking" feed (newest first). The Open Questions screen's "all" = every question not yet answered; "mine" and "unassigned" also exclude answered ones.
+- Step 4: Answered questions can be reopened (status back to open, the answer is kept). Items can be soft deleted from the page (spec section 8); restoring them is phase 2.
+- Step 4: Assignees are chosen from active partners; a removed partner who is already assigned stays shown by name.
+- Step 4: Adding an item does not change the idea's `updated_at`, so it does not trigger the "new" mark on the home screen (the mark follows edits to the idea itself).
 
 ---
 
@@ -160,6 +164,11 @@ Done when: spec acceptance criteria 2, 3, 4, 13 pass (create under a minute; edi
 concurrent editors get the warning with no lost text; restoring version 2 after 5 makes version 6).
 
 ### Step 4 - Shared thinking and questions
+- [x] Done 25.10.2026: idea page "open questions" and "shared thinking" areas (add thought / question /
+  info; question status, assignee, answer, reopen; soft delete with confirmation) and the cross-idea Open
+  Questions screen (all / mine / unassigned / answered; a row opens the question highlighted on its idea).
+  Checked in Chrome: criterion 5 (each item shows type, author and time; empty text refused) and 6
+  (answering moves the question to "answered", out of "all" and into "answered" on the questions screen).
 Read spec section 6. Prompt: "On the idea page, build adding a thought / question / info, answering a
 question (moves it to answered), and the cross-idea Open Questions screen with its filters."
 Done when: acceptance criteria 5 and 6 pass.

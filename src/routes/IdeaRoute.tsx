@@ -23,6 +23,7 @@ import { CategoryChip } from '../features/ideas/badges';
 import { clearDraft, readDraft, sameSnapshot, type Draft } from '../features/ideas/draft';
 import { IdeaEditor } from '../features/ideas/IdeaEditor';
 import { partnerName, useLookups } from '../features/ideas/useLookups';
+import { IdeaItems } from '../features/items/IdeaItems';
 
 type Loaded = { idea: Idea; sections: Sections } | 'notFound';
 
@@ -323,6 +324,8 @@ function IdeaPage({ id }: { id: string }) {
           ))}
         </dl>
       </section>
+
+      <IdeaItems ideaId={id} lookups={lookups} />
     </article>
   );
 }
