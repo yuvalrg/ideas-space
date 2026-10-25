@@ -24,6 +24,8 @@ import { clearDraft, readDraft, sameSnapshot, type Draft } from '../features/ide
 import { IdeaEditor } from '../features/ideas/IdeaEditor';
 import { partnerName, useLookups } from '../features/ideas/useLookups';
 import { IdeaItems } from '../features/items/IdeaItems';
+import { IdeaResources } from '../features/resources/IdeaResources';
+import { IdeaDecisions } from '../features/decisions/IdeaDecisions';
 
 type Loaded = { idea: Idea; sections: Sections } | 'notFound';
 
@@ -326,6 +328,8 @@ function IdeaPage({ id }: { id: string }) {
       </section>
 
       <IdeaItems ideaId={id} lookups={lookups} />
+      <IdeaResources ideaId={id} lookups={lookups} />
+      <IdeaDecisions ideaId={id} lookups={lookups} onIdeaChanged={() => void load()} />
     </article>
   );
 }

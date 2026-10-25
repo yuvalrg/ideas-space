@@ -72,6 +72,11 @@ Add new out-of-scope ideas here instead of building them.
 - Step 4: Answered questions can be reopened (status back to open, the answer is kept). Items can be soft deleted from the page (spec section 8); restoring them is phase 2.
 - Step 4: Assignees are chosen from active partners; a removed partner who is already assigned stays shown by name.
 - Step 4: Adding an item does not change the idea's `updated_at`, so it does not trigger the "new" mark on the home screen (the mark follows edits to the idea itself).
+- Step 5: Storage object keys accept only a safe ASCII subset, so the path is `ideas/{idea_id}/{file_id}_{ascii name}` (Hebrew letters become `_`, the extension is kept); the original name stays in `files.original_name` and is what the UI shows.
+- Step 5: Upload order: storage object, then `files`, then `resources`; if a row insert fails the object is removed again. Not a single transaction (storage is outside Postgres), but nothing is left half-visible.
+- Step 5: Due dates use the native `<input type="date">` (RTL in Chrome, Android and iOS); no date-picker library.
+- Step 5: Deleting a decision hides it only; the idea keeps the next step, owner and status it set.
+- Step 5: The signed-URL expiry was tested with a 2-second URL (fails after expiry, "exp" claim); production URLs last 60 minutes.
 
 ---
 
@@ -174,6 +179,15 @@ question (moves it to answered), and the cross-idea Open Questions screen with i
 Done when: acceptance criteria 5 and 6 pass.
 
 ### Step 5 - Resources, files, decisions
+- [x] Done 25.10.2026: "resources and files" (link or file; name derived when empty; description and
+  "what we learn"; choose file or take photo with `capture="environment"`; 25MB and type checks; images
+  over 2500px downscaled; open through a 60-minute signed URL; soft delete) and "decisions and next step"
+  (one required field; next step, assignee, due date and new status written to the idea by
+  `record_decision`; soft delete). Checked in Chrome: criterion 7 (link and file added; a 3000x2000 photo
+  stored at 2500x1667; signed URL opens the file, the same URL fails after it expires, the public URL
+  fails), 8 (status changes in activity_log with actor, time, old and new; the activity screen is step 6),
+  9 (decision updates the idea header and the home card, overdue date in red). Not checked: the camera on a
+  real phone.
 Read spec sections 6, 9. Prompt: "Build resources (link or file, one required field), upload to the
 `idea-files` bucket with camera capture on mobile and client-side downscaling, signed 60-minute view URLs,
 and the decision form calling `record_decision` so next_step/owner/status land on the idea."
