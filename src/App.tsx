@@ -12,6 +12,7 @@ import { QuestionsRoute } from './routes/QuestionsRoute';
 import { ActivityRoute } from './routes/ActivityRoute';
 import { TrashRoute } from './routes/TrashRoute';
 import { SettingsRoute } from './routes/SettingsRoute';
+import { IdeaPrintRoute } from './routes/IdeaPrintRoute';
 
 /** Every route except /login sits behind RequireAuth (spec section 11: no public pages). */
 export function App() {
@@ -22,6 +23,7 @@ export function App() {
           <Route path="/login" element={<LoginRoute />} />
           <Route element={<RequireAuth />}>
             <Route path="/welcome" element={<WelcomeRoute />} />
+            <Route path="/ideas/:id/print" element={<IdeaPrintRoute />} />
             <Route element={<AppShell />}>
               <Route index element={<HomeRoute />} />
               <Route path="ideas/new" element={<NewIdeaRoute />} />

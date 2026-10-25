@@ -81,6 +81,11 @@ Add new out-of-scope ideas here instead of building them.
 - Step 6: Removing a partner requires typing their display name (or email if they never joined) - spec decision 6. Removing yourself ends your access at once (the no-access screen).
 - Step 6: Inviting does not send an email (Supabase has no invite-only flow that fits magic links here); the address is added to the allowed list and the partner signs in from the login page.
 - Step 6: The activity line is "actor · action · idea", with user content (snippet, email, new workspace name) underneath; idea.* actions show only the idea link. Trashed ideas show their title without a link.
+- Step 7: One export format for the Settings buttons and the scripts (`src/features/export/format.ts`, no imports so Node runs it directly). The app reads with the member's session (RLS lets members read every table); the CLI reads as the project owner. Same rows either way.
+- Step 7: The import pauses triggers (`session_replication_role = replica`) so rows land exactly as exported (no re-stamping, no extra activity), creates an auth user per profile (same id and email), and replaces the seed rows of a fresh project. It refuses a project that already has ideas or profiles.
+- Step 7: `--offline` import = the restore check without a second project (PGlite with migrations + seed). The full restore test into a separate Supabase project stays in step 8.
+- Step 7: Scripts are TypeScript run by Node's type stripping, hence `engines.node >= 22.18`. Shared helpers: `scripts/db-offline/pglite.mjs` (fresh offline DB) and `scripts/supabase-cli.mjs` (SQL through `supabase db query --linked`).
+- Step 7: The CSV lists ideas not in the trash; dates in Israel time.
 
 ---
 
@@ -213,6 +218,13 @@ last-partner guard), and the `new` mark via `touch_last_seen`."
 Done when: acceptance criteria 10, 12 pass; removing a partner blocks their next API call.
 
 ### Step 7 - Export, import, print
+- [x] Done 25.10.2026: export as JSON (all 12 tables, every row and column) and ideas CSV (UTF-8 with
+  BOM), both from Settings and from `npm run export`; `npm run import -- <file> --offline | --linked`;
+  print view at `/ideas/:id/print` (description, 10 sections, questions with answers, thoughts and info,
+  decisions, resources). Criterion 14: the dev project's export loaded with `--offline` gives identical
+  counts in every table; `--linked` into the (non-empty) dev project is refused with target_not_empty and
+  changes nothing; the in-app export gives the same counts as the CLI export. Not yet done: a `--linked`
+  import into a second, empty Supabase project (that is the step 8 restore test).
 Read spec section 10. Prompt: "Write `scripts/export.ts` (full JSON, ideas CSV as UTF-8 with BOM) and
 `scripts/import.ts` (load a JSON export into an empty project), and a clean print view for a single idea."
 Done when: acceptance criterion 14 passes (export JSON imports into a test project with identical counts).

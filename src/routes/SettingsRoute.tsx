@@ -7,6 +7,7 @@ import { Dialog } from '../components/Dialog';
 import { TimeAgo } from '../components/TimeAgo';
 import { useAuth } from '../features/auth/authContext';
 import { invalidateLookups } from '../features/ideas/useLookups';
+import { downloadCsv, downloadJson } from '../features/export/api';
 import {
   avatarUrls,
   getWorkspaceName,
@@ -453,7 +454,55 @@ function PartnersSection({
   );
 }
 
-/** Settings (spec section 6): workspace name, my profile, partners. */
+/** Monthly copy outside the provider (spec section 10): whole database as JSON, ideas as CSV. */
+function ExportSection() {
+  const id = useId();
+  const [busy, setBusy] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback>(null);
+
+  async function run(action: () => Promise<string>) {
+    setBusy(true);
+    setFeedback(null);
+    try {
+      const name = await action();
+      setFeedback({ kind: 'ok', text: t('settings.exported', { name }) });
+    } catch (cause) {
+      setFeedback({ kind: 'error', key: errorMessageKey(cause) });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="card" aria-labelledby={`${id}-title`}>
+      <h2 id={`${id}-title`} className="text-lg font-bold text-slate-900">
+        {t('settings.exportTitle')}
+      </h2>
+      <p className="mt-2 text-sm text-slate-600">{t('settings.exportIntro')}</p>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          className="btn-primary"
+          disabled={busy}
+          onClick={() => void run(downloadJson)}
+        >
+          {busy ? t('settings.exporting') : t('settings.exportJson')}
+        </button>
+        <button
+          type="button"
+          className="btn-secondary"
+          disabled={busy}
+          onClick={() => void run(downloadCsv)}
+        >
+          {t('settings.exportCsv')}
+        </button>
+        <FeedbackLine feedback={feedback} />
+      </div>
+    </section>
+  );
+}
+
+/** Settings (spec section 6): workspace name, my profile, partners, export. */
 export function SettingsRoute() {
   const { profile } = useAuth();
   const [partners, setPartners] = useState<Partner[] | null>(null);
@@ -492,6 +541,7 @@ export function SettingsRoute() {
       <WorkspaceSection />
       <ProfileSection avatarUrl={myAvatar ? (avatars.get(myAvatar) ?? null) : null} />
       <PartnersSection partners={partners} avatars={avatars} onChanged={refresh} />
+      <ExportSection />
     </section>
   );
 }

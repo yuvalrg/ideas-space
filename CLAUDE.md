@@ -92,7 +92,8 @@ npm run db:push                  # migrations + seed to the linked dev project
 npm run gen:types                # regenerate src/lib/database.types.ts after a migration
 npx supabase config push         # auth settings from supabase/config.toml (run config diff first)
 npm run export                   # scripts/export.ts -> exports/<date>/
-npm run import -- <file.json>    # scripts/import.ts into the linked (empty) project
+npm run import -- <file.json> --offline   # restore check into a fresh local database
+npm run import -- <file.json> --linked    # into the linked project, refused unless it is empty
 ```
 
 Environment variables (`.env.local`, never committed): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.

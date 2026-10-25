@@ -32,6 +32,18 @@
   }
 }
 
+/* Printing an idea (spec section 10): white page, A4 margins. */
+@media print {
+  @page {
+    margin: 15mm;
+  }
+
+  html,
+  body {
+    background: white;
+  }
+}
+
 /* Shared controls. Touch targets are at least 44px high (spec section 12). */
 @layer components {
   .btn-primary {

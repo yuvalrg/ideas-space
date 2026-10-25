@@ -9,27 +9,18 @@
 // the last statement's result, so each file ends by raising an exception that carries the pgTAP
 // counts. The exception also guarantees the transaction rolls back: nothing is left behind.
 
-import { spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, readdir, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { dirname, join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFile } from 'node:fs/promises';
+import { join, relative } from 'node:path';
+import { createOfflineDb, root, sqlFiles } from './db-offline/pglite.mjs';
+import { runLinkedSql } from './supabase-cli.mjs';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const remote = process.argv.includes('--remote');
-
-async function sqlFiles(dir) {
-  const names = (await readdir(dir)).filter((name) => name.endsWith('.sql')).sort();
-  return names.map((name) => join(dir, name));
-}
-
 const testFiles = await sqlFiles(join(root, 'supabase', 'tests'));
 let failures = 0;
 let assertions = 0;
 
 if (remote) {
   console.log('# remote: testing the linked Supabase project');
-  const work = await mkdtemp(join(tmpdir(), 'ideas-space-tests-'));
 
   for (const file of testFiles) {
     const sql = (await readFile(file, 'utf8'))
@@ -41,15 +32,7 @@ do $$ begin
     (select value from __tcache__ where label = 'curr_test'), num_failed();
 end $$;
 `;
-    const target = join(work, file.split(/[\\/]/).pop());
-    await writeFile(target, wrapped, 'utf8');
-
-    // One command string (target is our own temp path); npx needs a shell on Windows.
-    const run = spawnSync(`npx supabase db query --linked -f "${target}"`, {
-      cwd: root,
-      shell: true,
-      encoding: 'utf8',
-    });
+    const run = await runLinkedSql(wrapped, file.split(/[\\/]/).pop());
     const output = `${run.stdout}\n${run.stderr}`;
     const match = output.match(/TAP_RESULT run=(\d+) failed=(\d+)/);
 
@@ -67,26 +50,15 @@ end $$;
     );
   }
 } else {
-  const { PGlite } = await import('@electric-sql/pglite');
-  const { pg_trgm } = await import('@electric-sql/pglite/contrib/pg_trgm');
-  const { pgtap } = await import('@electric-sql/pglite-pgtap');
-  const db = await PGlite.create({ extensions: { pg_trgm, pgtap } });
-
-  const setup = [
-    join(root, 'scripts', 'db-offline', 'supabase-shim.sql'),
-    ...(await sqlFiles(join(root, 'supabase', 'migrations'))),
-    join(root, 'supabase', 'seed.sql'),
-  ];
-  for (const file of setup) {
-    try {
-      await db.exec(await readFile(file, 'utf8'));
-    } catch (error) {
-      console.error(`setup failed in ${relative(root, file)}: ${error.message}`);
-      if (error.where) console.error(error.where);
-      process.exit(1);
-    }
+  let db;
+  try {
+    const created = await createOfflineDb();
+    db = created.db;
+    console.log(`# offline setup ok: ${created.setupCount} files applied`);
+  } catch (error) {
+    console.error(error.message);
+    process.exit(1);
   }
-  console.log(`# offline setup ok: ${setup.length} files applied`);
 
   for (const file of testFiles) {
     console.log(`\n# ${relative(root, file)}`);

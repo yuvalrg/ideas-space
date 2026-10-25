@@ -238,6 +238,9 @@ function IdeaPage({ id }: { id: string }) {
             <Link to={`/ideas/${id}/versions`} className={menuItemClass}>
               {t('idea.versions')}
             </Link>
+            <Link to={`/ideas/${id}/print`} className={menuItemClass}>
+              {t('idea.print')}
+            </Link>
             <button
               type="button"
               className={menuItemClass}
