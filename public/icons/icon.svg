@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- App icon: a light bulb on the brand blue. Full-bleed square so it also works as maskable. -->
+  <rect width="512" height="512" fill="#2563eb"/>
+  <g fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 120c-62 0-108 46-108 104 0 38 19 64 41 86 15 15 25 32 25 52v14h84v-14c0-20 10-37 25-52 22-22 41-48 41-86 0-58-46-104-108-104z"/>
+    <path d="M214 404h84"/>
+    <path d="M226 444h60"/>
+  </g>
+</svg>

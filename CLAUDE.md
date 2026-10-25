@@ -40,7 +40,8 @@ src/lib/i18n/he.json          every UI string, Hebrew only
 src/features/<area>/          auth, ideas, items, resources, decisions, trash, activity, settings, export
 src/components/               shared UI
 src/routes/                   one file per screen
-public/manifest.json          PWA manifest
+public/icons/, public/sw.js   PWA icons and service worker (manifest generated from he.json in vite.config.ts)
+src/lib/database.types.ts     generated DB types (npm run gen:types)
 ```
 
 ## Hard rules
@@ -88,6 +89,8 @@ supabase db reset                # local: rebuild from migrations + seed
 npm run test:db                  # runs supabase/tests/*.sql offline on PGlite (no Docker, no network)
 npm run test:db:remote           # same tests against the linked dev project (needs open Postgres ports)
 npm run db:push                  # migrations + seed to the linked dev project
+npm run gen:types                # regenerate src/lib/database.types.ts after a migration
+npx supabase config push         # auth settings from supabase/config.toml (run config diff first)
 npm run export                   # scripts/export.ts -> exports/<date>/
 npm run import -- <file.json>    # scripts/import.ts into the linked (empty) project
 ```

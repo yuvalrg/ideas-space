@@ -52,6 +52,16 @@ Add new out-of-scope ideas here instead of building them.
 - Step 1: Grants are a second layer under RLS: anon has no table privileges, function EXECUTE is revoked from PUBLIC and granted per API function. New tables and functions in later migrations must grant explicitly.
 - Step 1: Resource links must start with http(s); items/resources/decisions stamp `created_by` / `deleted_by` / `answered_by` in triggers, so the client cannot spoof them.
 - Step 1: Workspace name seeded as "מרחב רעיונות משותף" (no name given yet; editable in settings in step 6).
+- Step 2: Auth settings live in `supabase/config.toml` and reach the dev project with `npx supabase config push` (no dashboard edits): site URL and redirect URLs (localhost:5173 dev, localhost:4173 preview), magic link expiry 15 minutes (`otp_expiry = 900`), 60s between links per address. Other values in config.toml were aligned to the project's current values so the push changes only these. Add the production URL in step 8.
+- Step 2: Magic links use the implicit flow (`flowType: 'implicit'`), so a link opened on another device (the phone's mail app) still signs in; PKCE would need the code verifier from the requesting browser.
+- Step 2: First entry = `profiles.last_seen_at IS NULL`. `/welcome` confirms the display name, then calls `touch_last_seen`. No schema change. The optional picture moves to "my profile" in settings (step 6), since it needs an upload path outside `ideas/`.
+- Step 2: The 30-day session in spec section 5 is the Supabase default behaviour (refresh tokens do not expire; the session renews on each visit). Hard session time-boxing is a paid Auth setting; not configured.
+- Step 2: The PWA manifest is generated from he.json by a small Vite plugin and served as `/manifest.webmanifest` (not a static `public/manifest.json`), so its Hebrew name stays in he.json. Icons: `public/icons/` (SVG source + 192/512 PNG).
+- Step 2: The service worker (`public/sw.js`) registers in production builds only. The in-app browser pane refuses service workers, so registration is checked in a regular browser.
+- Step 2: No component library yet; step 2 needs only buttons, inputs and a drawer (plain Tailwind). Choose an RTL-verified library when date pickers and menus arrive (step 5).
+- Step 2: The magic-link email uses Supabase's default (English) template and sender until Resend and a Hebrew template are set up in step 8. The default sender allows about 2 emails per hour and delivers only to members of the Supabase organization's team; other addresses get `email_address_not_authorized` (shown as `errors.emailNotAuthorized`). Until Resend: invite each partner's email to the Supabase organization team.
+- Step 2: Testing on a phone against the dev server needs the laptop's LAN origin (e.g. `http://192.168.x.y:5173`) in `additional_redirect_urls` and `npm run dev -- --host`, or a deployed preview URL; `localhost` in the link points at the phone itself.
+- Step 2: DB types: `src/lib/database.types.ts`, regenerated with `npm run gen:types` after each migration.
 
 ---
 
@@ -116,6 +126,10 @@ Done when: `supabase db reset` applies cleanly; `npm run test:db` passes; a non-
 table; the four write functions exist and raise the listed errors.
 
 ### Step 2 - Shell and auth
+- [ ] Built 25.10.2026: login (allowed-list check, Hebrew refusal, expired-link message), first-entry name,
+  guarded routes, right-side nav with mobile drawer, PWA manifest + icons + service worker. Checked in the
+  browser pane (desktop and mobile layouts, refusal message, redirect to login). Still open: the human check,
+  two partners signing in on desktop and mobile, and refresh keeping the session.
 Read spec sections 5, 6, 12. Prompt: "Build the magic-link login (call `check_email_allowed` first, show the
 Hebrew not-allowed message otherwise), profile creation on first entry, the right-side nav (hamburger under
 768px), the RTL base, routing, and the PWA manifest. Protect all routes behind a session."
