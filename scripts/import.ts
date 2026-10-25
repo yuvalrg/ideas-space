@@ -1,8 +1,9 @@
-// npm run import -- <export.json> --offline | --linked
+// npm run import -- <export.json> --offline | --linked | --project-ref=<ref>
 //
 // Loads a JSON export (spec section 10) into an empty project and compares row counts.
 //   --offline  into a fresh local database (PGlite: migrations + seed), no network. The restore check.
-//   --linked   into the Supabase project the CLI is linked to. Refused unless that project has no
+//   --project-ref=<ref>  into that project (a restore-test project, or a new prod), dev link untouched.
+//   --linked   into the Supabase project the CLI is linked to. Either way refused unless the target has no
 //              ideas and no profiles yet (a fresh project: migrations, optionally the seed).
 //
 // Rows are inserted exactly as exported (ids, authors, times, activity). Triggers are paused for the
@@ -23,12 +24,18 @@ import { queryLinked, runLinkedSql } from './supabase-cli.mjs';
 
 const args = process.argv.slice(2);
 const path = args.find((arg) => !arg.startsWith('--'));
-const mode = args.includes('--linked') ? 'linked' : args.includes('--offline') ? 'offline' : null;
+const mode =
+  args.includes('--linked') || args.some((arg) => arg.startsWith('--project-ref='))
+    ? 'linked'
+    : args.includes('--offline')
+      ? 'offline'
+      : null;
 
 if (!path || !mode) {
   console.error('Usage: npm run import -- <export.json> --offline   (local check, no network)');
   console.error(
-    '       npm run import -- <export.json> --linked    (into the linked, empty project)',
+    '       npm run import -- <export.json> --linked    (into the linked, empty project)\n' +
+      '       npm run import -- <export.json> --project-ref=<ref>  (into that empty project)',
   );
   process.exit(1);
 }

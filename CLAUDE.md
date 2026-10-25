@@ -91,6 +91,9 @@ npm run test:db:remote           # same tests against the linked dev project (ne
 npm run db:push                  # migrations + seed to the linked dev project
 npm run gen:types                # regenerate src/lib/database.types.ts after a migration
 npx supabase config push         # auth settings from supabase/config.toml (run config diff first)
+npm run check:anon               # criterion 19: anon key alone gets no data (SUPABASE_URL/ANON_KEY for prod)
+# prod / restore-test project without relinking: add --linked --project-ref <ref> to supabase commands,
+# or --project-ref=<ref> to npm run export / import. See docs/launch.he.md.
 npm run export                   # scripts/export.ts -> exports/<date>/
 npm run import -- <file.json> --offline   # restore check into a fresh local database
 npm run import -- <file.json> --linked    # into the linked project, refused unless it is empty

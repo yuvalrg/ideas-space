@@ -86,6 +86,10 @@ Add new out-of-scope ideas here instead of building them.
 - Step 7: `--offline` import = the restore check without a second project (PGlite with migrations + seed). The full restore test into a separate Supabase project stays in step 8.
 - Step 7: Scripts are TypeScript run by Node's type stripping, hence `engines.node >= 22.18`. Shared helpers: `scripts/db-offline/pglite.mjs` (fresh offline DB) and `scripts/supabase-cli.mjs` (SQL through `supabase db query --linked`).
 - Step 7: The CSV lists ideas not in the trash; dates in Israel time.
+- Step 8: Two projects without switching the CLI link: everything that targets prod or a restore-test project passes `--linked --project-ref <ref>` (the CLI's way to override the stored link). The dev link stays the default, so no command reaches prod by accident.
+- Step 8: Sign-in email templates are server-side text, so their Hebrew lives in `supabase/templates/*.html` and the subjects in `config.toml` (an exception to hard rule 3, which cannot apply to emails Supabase sends). Supabase accepts custom templates only with custom SMTP (tested: 400 "not available for free tier projects using the default email provider").
+- Step 8: The Resend API key is passed as `SUPABASE_AUTH_SMTP_PASS` in the partner's terminal for `config push`; it is never written to a file or sent in chat.
+- Step 8: Criterion 18 was checked by making `fetch` fail in the page during a save (same effect for the app as a dropped connection). A real airplane-mode check on a phone is in the launch list.
 
 ---
 
@@ -230,6 +234,15 @@ Read spec section 10. Prompt: "Write `scripts/export.ts` (full JSON, ideas CSV a
 Done when: acceptance criterion 14 passes (export JSON imports into a test project with identical counts).
 
 ### Step 8 - Hardening and launch
+- [ ] Prepared 25.10.2026 (the rest needs the partners' accounts; step-by-step in `docs/launch.he.md`):
+  `vercel.json` (SPA routes, security and cache headers); Hebrew sign-in email templates
+  (`supabase/templates/`, active once custom SMTP is set); commented Resend SMTP and
+  `[remotes.production]` sections in `config.toml`; `npm run check:anon` (criterion 19, passes on dev);
+  export/import accept `--project-ref=<ref>` (prod and restore-test projects without relinking).
+  Criterion 18 checked on dev in Chrome (simulated network drop on idea edit, new item and new idea:
+  red error, text kept, edit draft kept; retry saves). Open: GitHub, domain, Resend, `ideas-prod`,
+  Vercel, then criteria 1-17 in prod by a partner who did not write the code, restore test (15),
+  RTL/mobile list (16), speed with 50 ideas (17), security review.
 Read spec sections 9, 10. Prompt: "Configure Resend SMTP and the custom domain, create and migrate
 `ideas-prod`, run the restore test and log it, go through the RTL and mobile checklist, and fix anything the
 acceptance criteria surface."

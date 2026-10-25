@@ -6,6 +6,7 @@ No idea is lost: every save is versioned, every delete is soft, backups are test
 - Product spec (Hebrew, source of truth): `docs/spec.he.md`
 - Build conventions for Claude Code: `CLAUDE.md`
 - Step-by-step build plan: `PLAN.md`
+- Launch guide (Hebrew: accounts, prod, checks): `docs/launch.he.md`
 
 ## Stack
 React + TypeScript + Vite, Tailwind (RTL), Supabase (Postgres + RLS, Auth magic link, Storage). No custom server.

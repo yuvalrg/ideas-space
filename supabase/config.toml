@@ -244,6 +244,28 @@ otp_expiry = 900
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# Step 8 - sending through Resend (docs/launch.he.md). Uncomment once the domain is verified in
+# Resend; the API key is read from the environment and never written here:
+#   $env:SUPABASE_AUTH_SMTP_PASS = "re_..."; npx supabase config push --linked --project-ref <ref>
+# [auth.email.smtp]
+# enabled = true
+# host = "smtp.resend.com"
+# port = 465
+# user = "resend"
+# pass = "env(SUPABASE_AUTH_SMTP_PASS)"
+# admin_email = "no-reply@DOMAIN"
+# sender_name = "מרחב רעיונות משותף"
+
+# Hebrew sign-in emails (the magic link, and the first-time confirmation). Supabase accepts custom
+# templates only with custom SMTP, so `config push` of the auth section fails until SMTP is set.
+[auth.email.template.magic_link]
+subject = "קישור כניסה למרחב רעיונות משותף"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.confirmation]
+subject = "ברוכים הבאים למרחב רעיונות משותף"
+content_path = "./supabase/templates/confirmation.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"
@@ -413,3 +435,12 @@ enabled = true
 # formatted with uppercase keywords, indent 2, max width 180, trailing commas,
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
+
+# Step 8 - production overrides (docs/launch.he.md). Uncomment with the ideas-prod ref and the domain;
+# `config push --linked --project-ref <prod ref>` then applies the [remotes.production] values on top.
+# [remotes.production]
+# project_id = "PROD_PROJECT_REF"
+#
+# [remotes.production.auth]
+# site_url = "https://DOMAIN"
+# additional_redirect_urls = ["https://DOMAIN"]

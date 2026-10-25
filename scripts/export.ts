@@ -1,4 +1,5 @@
-// npm run export: saves the whole database (JSON) and the ideas CSV of the linked project into
+// npm run export [-- --project-ref=<ref>]: saves the whole database (JSON) and the ideas CSV of the
+// linked project (or the given one, e.g. prod) into
 // exports/<YYYY-MM-DD>/ (spec section 10). Reads as the project owner through the Supabase CLI, so
 // it includes everything a member sees, trashed ideas too. The same format as the settings button.
 

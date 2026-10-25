@@ -7,13 +7,24 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { root } from './db-offline/pglite.mjs';
 
+/**
+ * The target project: `--project-ref=<ref>` on the command line (prod, or a restore-test project)
+ * or else the linked dev project. Using a ref leaves the dev link untouched.
+ */
+export function targetFlag(argv = process.argv) {
+  const ref = argv.find((arg) => arg.startsWith('--project-ref='))?.split('=')[1];
+  if (ref && !/^[a-z]{20}$/.test(ref)) throw new Error(`Not a project ref: ${ref}`);
+  // The CLI takes --project-ref together with --linked: the ref overrides the stored link.
+  return ref ? `--linked --project-ref ${ref}` : '--linked';
+}
+
 /** Runs a SQL text; returns stdout + stderr (the result is JSON on stdout). */
 export async function runLinkedSql(sql, name = 'query.sql') {
   const work = await mkdtemp(join(tmpdir(), 'ideas-space-'));
   const file = join(work, name);
   await writeFile(file, sql, 'utf8');
   // One command string (the path is our own temp file); npx needs a shell on Windows.
-  const run = spawnSync(`npx supabase db query --linked -f "${file}"`, {
+  const run = spawnSync(`npx supabase db query ${targetFlag()} -f "${file}"`, {
     cwd: root,
     shell: true,
     encoding: 'utf8',
