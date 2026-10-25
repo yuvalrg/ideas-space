@@ -5,6 +5,7 @@ import { Message } from '../lib/i18n/Message';
 import { errorMessageKey, getSupabase } from '../lib/supabase';
 import { CenteredCard } from '../components/CenteredCard';
 import { needsWelcome, useAuth } from '../features/auth/authContext';
+import { invalidateLookups } from '../features/ideas/useLookups';
 
 /**
  * First entry (spec section 5): the sign-up trigger created the profile with a name taken from the
@@ -39,6 +40,7 @@ export function WelcomeRoute() {
       if (updated.data.length !== 1) throw new Error('profile_not_updated');
       const touched = await supabase.rpc('touch_last_seen');
       if (touched.error) throw touched.error;
+      invalidateLookups(); // partner names changed
       await reload(); // profile.last_seen_at is now set; the guard lets the partner in
     } catch (cause) {
       // The typed name stays in the field (hard rule 6).

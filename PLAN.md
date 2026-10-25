@@ -62,6 +62,12 @@ Add new out-of-scope ideas here instead of building them.
 - Step 2: The magic-link email uses Supabase's default (English) template and sender until Resend and a Hebrew template are set up in step 8. The default sender allows about 2 emails per hour and delivers only to members of the Supabase organization's team; other addresses get `email_address_not_authorized` (shown as `errors.emailNotAuthorized`). Until Resend: invite each partner's email to the Supabase organization team.
 - Step 2: Testing on a phone against the dev server needs the laptop's LAN origin (e.g. `http://192.168.x.y:5173`) in `additional_redirect_urls` and `npm run dev -- --host`, or a deployed preview URL; `localhost` in the link points at the phone itself.
 - Step 2: DB types: `src/lib/database.types.ts`, regenerated with `npm run gen:types` after each migration.
+- Step 3: No new migration. The home screen loads every live idea once and filters, sorts and marks "new" in the browser (2-6 partners, small data). Search runs on the server: ILIKE on title/summary (`ideas_live`) plus section content (`idea_sections`), merged by idea id. User text is escaped (`% _ \`) and double-quoted inside `.or()`.
+- Step 3: Filters, sort and search live in the URL (`?q=&status=&category=&sort=`); the cards/list choice is a per-browser preference in localStorage. The status filter defaults to "active" (hides paused and dropped).
+- Step 3: "New since last visit" = updated after the `last_seen_at` read at sign-in, by someone else. The baseline is captured once per page load, then the home screen calls `touch_last_seen`.
+- Step 3: One edit mode for the whole idea (title, summary, category, 10 sections) and one save = one version. `saveIdea` always sends all 10 sections (blank clears).
+- Step 3: Local draft every 5 seconds while the form differs from the saved idea, keyed per idea, with the version it started from. A restored draft saves against that version, so a change made meanwhile raises the conflict dialog instead of being overwritten silently. Drafts clear on a successful save or an explicit discard.
+- Step 3: Dialogs use the native `<dialog>` element (focus trap, Escape, RTL for free); no component library yet.
 
 ---
 
@@ -137,6 +143,14 @@ Done when: two partners sign in on desktop and mobile; an email not on the list 
 message; refresh keeps the session.
 
 ### Step 3 - Ideas and versions
+- [x] Done 25.10.2026: home (cards/list, search, status/category filters, sort, new mark), create idea,
+  idea page (status, description, 10 sections), edit with local drafts and the conflict dialog, version
+  history and restore, duplicate. Checked in Chrome with a signed-in partner: criterion 2 (created in 13s,
+  lands on the idea page), 3 (edit -> version 2 in history; draft written after 5s, cleared on save),
+  4 (two tabs: conflict dialog, text kept, "load new version" offers the draft, "save anyway" -> new version,
+  all versions kept), 13 (restore v2 after v5 -> v6 "restored from 2", v3-v5 kept). Search (summary,
+  section, special characters), status filter default and list view checked too. Not yet checked: the
+  "new" mark (needs a second partner's edit) and phone width for these screens.
 Read spec sections 3, 6, 8. Prompt: "Build the home screen (cards and list, search, status and category
 filters, sort, default-hiding paused and dropped, the `new-since-last-visit` mark via `last_seen_at`),
 create-idea (two required fields), and the idea page top area plus the current-description and 10 sections,
